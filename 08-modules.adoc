@@ -1,0 +1,119 @@
+= 模块 Modules
+
+
+
+
+到目前为止，我们使用的都是每次新建 Nim 文件时默认提供的功能。这些功能可以通过模块进行扩展，从而获得针对特定主题的更多功能。
+
+最常用的Nim模块包括：
+
+* `strutils`: 处理字符串时的附加功能
+* `sequtils`: 处理序列时的附加功能
+* `math`: 数学函数（对数、平方根等）、三角函数（正弦、余弦等）
+* `times`: 测量和处理时间
+
+但还有更多模块，无论是在所谓的标准库（ https://nim-lang.org/docs/lib.html[standard library] ）中，还是在nimble包管理器（ https://nimble.directory/[nimble package manager] ）中。
+
+
+
+
+== 导入模块
+
+如果我们想导入一个模块及其所有功能，只需在文件中添加 `import <moduleName>` 。通常这会在文件顶部完成，以便我们轻松查看代码使用了哪些内容。
+
+[source]
+.stringutils.nim
+----
+include::{source-dir}/stringutils.nim[]
+----
+<1> 导入 https://nim-lang.org/docs/strutils.html[strutils] 模块.
+<2> 使用 `strutils` 模块中的 `split` 功能。它可以将字符串分割成单词序列。
+<3> `toUpperAscii` 将所有 ASCII 字母转换为大写形式。
+<4> `repeat` 同样来自 strutils 模块，它能将单个字符或整个字符串重复指定次数。
+
+[source, output]
+----
+@["My", "string", "with", "whitespace."]
+MY STRING WITH WHITESPACE.
+!!!!!
+----
+
+NOTE: 对于来自其他编程语言（尤其是 Python）的用户来说，Nim 中的导入方式可能看起来"不太对"。如果是这种情况，建议阅读 https://narimiran.github.io/2019/07/01/nim-import.html[以下内容] 。
+
+{nbsp}
+
+
+[source]
+.maths.nim
+----
+include::{source-dir}/maths.nim[]
+----
+<1> Importing https://nim-lang.org/docs/math.html[math].
+<2> 使用 `degToRad` 将度数转换为弧度。
+<3> `sin` 接收弧度值。我们将结果（同样来自 `math` 模块）四舍五入至最多两位小数。（否则结果会是：0.4999999999999999）
+<4> 数学模块还包含用于计算数字幂的 `^` 运算符。
+
+[source, output]
+----
+0.5235987755982988
+0.5
+32
+----
+
+
+
+
+== 创建我们自己的
+
+在项目中，我们经常会有大量代码，这时将其拆分成各自负责特定功能的模块就很有意义。
+如果你在同一个文件夹中创建两个文件（假设命名为 `firstFile.nim` 和 `secondFile.nim` ），就可以将一个文件作为模块导入另一个文件中：
+
+[source]
+.firstFile.nim
+----
+proc plus*(a, b: int): int = <1>
+  return a + b
+
+proc minus(a, b: int): int = <2>
+  return a - b
+----
+<1> 注意 `plus` 过程现在名称后带有星号（ `*` ），这告诉 Nim 其他导入此文件的模块将能够使用该过程。
+<2> 相比之下，导入此文件时将不会显示该内容。
+
+[source]
+.secondFile.nim
+----
+import firstFile          <1>
+
+echo plus(5, 10)          <2>
+echo minus(10, 5) # error <3>
+----
+<1> 这里我们导入 `firstFile.nim` ，无需在此处添加 `.nim` 扩展名。
+<2> 这段代码能正常运行并输出 `15` ，因为它在 `firstFile` 中声明且对我们可见。
+<3> 然而这会抛出错误，因为 `minus` 过程不可见，其名称后未带星号
+
+
+如果你有超过这两个文件，可能需要将它们组织到一个子目录（或多个子目录）中。
+采用如下目录结构：
+
+[source, output]
+----
+.
+├── myOtherSubdir
+│   ├── fifthFile.nim
+│   └── fourthFile.nim
+├── mySubdir
+│   └── thirdFile.nim
+├── firstFile.nim
+└── secondFile.nim
+----
+
+如果你想导入 `secondFile.nim` 中的所有其他文件，可以这样操作：
+
+[source]
+.secondFile.nim
+----
+import firstFile
+import mySubdir/thirdFile
+import myOtherSubdir / [fourthFile, fifthFile]
+----

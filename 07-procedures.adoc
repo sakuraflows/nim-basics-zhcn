@@ -1,0 +1,306 @@
+= 过程 Procedures
+
+
+
+过程（在其他编程语言中常称为函数）是将执行特定任务的代码封装为一个独立单元。
+这种代码组织方式的优势在于，我们可以直接调用这些过程，而无需在每次需要时重复编写相同的代码。
+
+在前面的某些章节中，我们探讨了不同场景下的考拉兹猜想。通过将考拉兹猜想逻辑封装成过程，我们就能在所有练习中调用相同的代码。
+
+到目前为止，我们已经使用了许多内置过程，例如用于打印的 `echo` 、向序列添加元素的 `add` 、增加整数值的 `inc` 、获取容器长度的 `len` 等。现在我们将学习如何创建和使用自己的过程。
+
+使用过程（procedure）的一些优势包括：
+
+* 减少代码重复
+* 通过为代码片段赋予功能描述性名称，使代码更易阅读
+* 将复杂任务分解为更简单的步骤
+
+正如本节开头所述，在其他语言中过程(procedure)常被称为函数(function)。若从数学函数的定义来看，这其实是个不太准确的称谓。数学函数接收一组参数（如 `f(x, y)` ，其中 `f` 是函数， `x` 和 `y` 是其参数），对于相同的输入总是返回相同的结果。
+
+另一方面，程序化过程对于给定输入并不总是返回相同输出。有时它们根本不返回任何内容。这是因为我们的计算机程序可以在之前提到的变量中存储状态，这些过程可以读取和更改状态。在Nim中，当前保留使用 `func` 这个词来表示数学上更准确的函数类型，强制要求无副作用。
+
+
+
+
+== 声明过程 Declaring a procedure
+
+在使用（调用）过程之前，我们需要创建它并定义其功能。
+
+过程通过使用 proc 关键字和过程名称来声明，后跟括号内的输入参数及其类型，最后部分是一个冒号和过程返回值的类型，如下所示：
+
+[source]
+----
+proc <name>(<p1>: <type1>, <p2>: <type2>, ...): <returnType>
+----
+
+过程体以缩进块的形式编写，紧跟在带有 `=` 符号的声明之后。
+
+[source]
+.callProcs.nim
+----
+include::{source-dir}/callProcs.nim[lines=1..8]
+----
+<1> 声明名为 `findMax` 的过程，它有两个参数 `x` 和 `y` ，并返回一个 `int` 类型。
+<2> 要从过程中返回值，我们使用 `return` 关键字。
+
+
+{nbsp}
+
+[source]
+----
+proc echoLanguageRating(language: string) = <1>
+  case language
+  of "Nim", "nim", "NIM":
+    echo language, " is the best language!"
+  else:
+    echo language, " might be a second-best language."
+----
+<1> `echoLanguageRating` 过程只是回显给定的名称，它不返回任何内容，因此没有声明返回类型。
+
+
+{nbsp}
+
+通常情况下，我们不允许修改传入的任何参数。类似这样的操作会引发错误：
+
+[source]
+----
+proc changeArgument(argument: int) =
+  argument += 5
+
+var ourVariable = 10
+changeArgument(ourVariable)
+----
+
+为了让这能够正常工作，我们需要允许Nim以及使用我们过程的程序员通过将参数声明为变量来修改它：
+
+[source]
+----
+proc changeArgument(argument: var int) = <1>
+  argument += 5
+
+var ourVariable = 10
+changeArgument(ourVariable)
+echo ourVariable
+changeArgument(ourVariable)
+echo ourVariable
+----
+<1> 注意 `argument` 现在被声明为 `var int` ，而不仅仅是 `int` 。
+
+[source, output]
+----
+15
+20
+----
+
+这当然意味着我们传入的名称也必须声明为变量，传入用 `const` 或 `let` 赋值的内容会引发错误。
+
+虽然将内容作为参数传递是良好的实践，但也可以使用过程外部声明的名称，包括变量和常量：
+
+[source]
+----
+var x = 100
+
+proc echoX() =
+  echo x  <1>
+  x += 1  <2>
+
+echoX()
+echoX()
+----
+<1> 这里我们访问外部变量 `x` 。
+<2> 我们可以更新它的值，因为它被声明为变量。
+[source, output]
+----
+100
+101
+----
+
+
+== 调用程序 Calling the procedures
+
+声明过程后，我们可以调用它。在许多编程语言中，调用过程/函数的常规方式是声明其名称并在括号内提供参数，如下所示：
+
+[source]
+----
+<procName>(<arg1>, <arg2>, ...)
+----
+
+调用过程的结果可以存储在变量中。
+
+如果要从上面的示例中调用我们的 findMax 过程，并将返回值保存在变量中，我们可以这样做：
+
+[source]
+.callProcs.nim
+----
+include::{source-dir}/callProcs.nim[lines=10..18]
+----
+<1> 函数 `findMax` 的结果在此处命名为 `c` ，并使用前两次调用( `findMax(987, 321)` )的结果进行调用。
+
+[source, output]
+----
+987
+321
+987
+----
+
+{nbsp}
+
+与其他许多语言不同，Nim 还支持统一函数调用( https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax[Uniform Function Call Syntax] )语法，这允许以多种不同方式调用过程。
+
+这是一种调用方式，其中第一个参数写在函数名之前，其余参数则在括号内声明：
+
+[source]
+----
+<arg1>.<procName>(<arg2>, ...)
+----
+
+我们在向现有序列添加元素时使用了这种语法（ `<seq>.add(<element>)` ），因为它比书写 `add(<seq>, <element>)` 更具可读性且能更清晰地表达意图。参数周围的括号也可以省略：
+
+[source]
+----
+<procName> <arg1>, <arg2>, ...
+----
+
+我们在调用 `echo` 过程时，以及无参数调用 `len` 过程时，已经见过这种风格的用法。这两种情况也可以像这样组合使用，不过这种语法并不常见：
+
+[source]
+----
+<arg1>.<procName> <arg2>, <arg3>, ...
+----
+
+
+{nbsp}
+
+统一调用语法使得多个过程的链式调用更具可读性：
+
+[source]
+.ufcs.nim
+----
+include::{source-dir}/ufcs.nim[]
+----
+<1> 若多个参数属于同一类型，我们可以采用这种简洁的方式进行类型声明。
+<2> 首先将 `a` 与 `b` 相加，然后将运算结果（2 + 3 = 5）作为第一个参数传递给 `multi` 过程，在该过程中与 `c` 相乘（5 * 4 = 20）。
+<3> 首先将 `c` 与 `b` 相乘，然后将运算结果（4*3=12）作为第一个参数传递给 `plus` 过程，在该过程中与 `a` 相加（12+2=14）。
+
+[source, output]
+----
+true
+true
+20
+14
+----
+
+
+
+
+== 结果变量 Result variable
+
+在Nim语言中，每个返回值的过程都会隐式声明并初始化（使用默认值）一个 `result` 变量。当过程执行到其缩进代码块末尾时，即使没有 `return` 语句，也会返回这个 `result` 变量的值。
+
+[source]
+.result.nim
+----
+include::{source-dir}/result.nim[lines=1..9]
+----
+<1> 返回类型是 `int` 。 `result` 变量会被初始化为 `int` 的默认值： `0` 。
+<2> 当过程执行结束时，将返回 `result` 的值。
+
+[source, output]
+----
+33
+----
+
+请注意，此处展示的过程是为了演示 `result` 变量，它并非完全正确：如果传入一个仅包含负数的序列，该过程将返回 `0` （而该值并不存在于序列中）。
+
+
+
+{nbsp}
+
+
+WARNING: 注意！
+在旧版 Nim（0.19.0 之前）中，字符串和序列的默认值为 https://en.wikipedia.org/wiki/Null_pointer[`nil`]，当我们将它们用作返回类型时， `result` 变量需要初始化为空字符串（ `""` ）或空序列（ `@[]` ）。
+
+[source]
+.result.nim
+----
+include::{source-dir}/result.nim[lines=11..20]
+----
+<1> 在Nim-0.19.0及更新版本中，无需这行代码 —— 序列会自动初始化为空序列。 +
+在旧版Nim中，序列必须手动初始化，缺少这行代码会导致编译器报错。（注意不应使用 `var` ，因为 `result` 已被隐式声明。）
+[source, output]
+----
+@[1, 43, 57]
+----
+
+
+{nbsp}
+
+在过程内部我们也可以调用其他过程。
+
+[source]
+.filterOdds.nim
+----
+include::{source-dir}/filterOdds.nim[]
+----
+<1> 新版本的 Nim 中不再需要这行代码。
+<2> 调用先前声明的过程。其返回类型为 `bool` ，可在 `if` 语句中使用。
+<3> 第三种调用过程的方式，如上文所示。
+
+[source, output]
+----
+@[6, 9, 0, 3]
+@[3]
+@[45390, 3219]
+----
+
+
+
+
+
+== 前置声明 Forward declaration
+
+正如本节开头所述，我们可以声明不带代码块的过程。
+原因在于必须先声明过程才能调用它们，以下做法是无效的：
+
+[source]
+----
+echo 5.plus(10) # error      <1>
+
+proc plus(x, y: int): int =  <2>
+  return x + y
+----
+<1> 这会抛出错误，因为 `plus` 尚未定义。
+<2> 这里我们定义了 `plus` ，但由于它出现在使用之后，Nim此时还不知道它的存在。
+
+解决这个问题的方法称为前置声明：
+
+[source]
+----
+proc plus(x, y: int): int    <1>
+
+echo 5.plus(10)              <2>
+
+proc plus(x, y: int): int =  <3>
+  return x + y
+----
+<1> 这里我们告诉Nim它应该认为 `plus` 过程是以这个定义存在的。
+<2> 现在我们可以在代码中自由使用它，这将正常工作。
+<3> 这里实际实现了 `plus` ，当然必须与我们之前的定义相匹配。
+
+
+
+
+
+== 练习
+
+1. 创建一个过程（procedure），用于根据提供的姓名向某人问候（打印"Hello <姓名>"）。创建一个姓名序列。使用已创建的过程向每个人问候。
+
+2. 创建一个过程 `findMax3` ，该过程将返回三个值中的最大值。
+
+3. 二维平面中的点可以表示为 `tuple[x, y: float]` 。编写一个过程，该过程接收两个点并返回一个新点，新点是这两个点的和（分别相加 x 坐标和 y 坐标）。
+
+4. 创建两个过程 `tick` 和 `tock` ，分别输出单词"tick"和"tock"。使用一个全局变量来记录它们运行的次数，并让它们相互调用直到计数器达到 20。预期输出是交替出现 20 行"tick"和"tock"。（提示：使用前向声明。）
+
+NOTE: 如果程序进入无限循环，可以按 Ctrl+C 停止执行。
+
+通过调用不同参数来测试所有过程。

@@ -1,0 +1,170 @@
+= 控制流 Control flow
+
+
+
+到目前为止，在我们的程序中，每一行代码都会在某个时刻执行。控制流语句允许我们编写仅在满足某些布尔条件时才会执行的代码部分。
+
+If we think of our program as a road we can think of control flow as various branches, and we pick our path depending on some condition.
+For example, we will buy eggs only _if_ their price is less than some value.
+如果我们将程序想象成一条道路，那么控制流就像是各种分支，我们根据某些条件来选择路径。例如，只有当鸡蛋的价格低于某个值时，我们才会购买。_或者_，如果下雨了，我们会带伞，否则（else）我们会带太阳镜。
+
+用伪代码( https://en.wikipedia.org/wiki/Pseudocode[pseudocode])表示，这两个例子看起来是这样的：
+
+[source]
+----
+if eggPrice < wantedPrice:
+  buyEggs
+
+if isRaining:
+  bring umbrella
+else:
+  bring sunglasses
+----
+
+Nim的语法非常相似，如下所示。
+
+
+
+
+
+== If 语句
+
+如上所示的 if 语句是分支程序的最简单方式。
+
+编写 if 语句的 Nim 语法是：
+
+[source]
+----
+if <condition>:     <1>
+  <indented block>  <2>
+----
+
+<1> condition（即“某种情况或情形”） 必须是布尔类型：可以是布尔变量，也可以是关系和/或逻辑表达式。
+<2> 在 `if` 行之后所有缩进两个空格的代码行构成同一个代码块，只有当条件为 `true` 时才会执行。
+
+if 语句可以嵌套，即在一个 if 代码块内部可以包含另一个 if 语句。
+
+[source]
+.if.nim
+----
+include::{source-dir}/if.nim[]
+----
+<1> 第一个条件为真，第二个为假——内部 `echo` 未执行。
+<2> 两个条件均为真，两行内容都会被打印。
+<3> 第一个条件为假——其代码块内的所有行都将被跳过，不会打印任何内容。
+<4> 在 `if` 语句中使用逻辑 `and` 。
+
+[source, output]
+----
+a is smaller than b
+b is smaller than c
+not only that, b is *much* smaller than c
+----
+
+
+
+=== Else (否则)
+
+Else 跟在 if 代码块之后，允许我们编写一段在 if 语句条件不成立时执行的代码分支。
+
+[source]
+.else.nim
+----
+include::{source-dir}/else.nim[]
+----
+
+[source, output]
+----
+d is a large number
+e is a small number
+----
+
+NOTE: 如果你只想在语句为 `false` 时执行一个代码块，可以简单地用 `not` 运算符对条件取反。
+
+
+
+
+=== Elif
+
+Elif 是"else if"的缩写，它使我们能够将多个 if 语句串联在一起。
+
+程序测试每一个语句，直到找到一个为真的语句。之后，所有后续语句都会被忽略。
+
+[source]
+.elif.nim
+----
+include::{source-dir}/elif.nim[]
+----
+
+[source, output]
+----
+f is larger than 1000
+g is smaller than 1000
+----
+
+NOTE: 在 `g` 的情况下，即使 `g` 满足所有三个条件，也只会执行第一个分支，自动跳过所有其他分支。
+
+
+
+
+== Case（情况）
+
+case 语句是另一种仅选择多个可能路径之一的方式，类似于带有多个 elif 的 if 语句。
+然而， case 语句不接受多个布尔条件，而是接受具有不同状态的任何值，并为每个可能的值提供一个路径。
+
+使用 if-elif 块编写的代码看起来像这样：
+
+[source]
+----
+if x == 5:
+  echo "Five!"
+elif x == 7:
+  echo "Seven!"
+elif x == 10:
+  echo "Ten!"
+else:
+  echo "unknown number"
+----
+可以使用 case 语句这样写:
+
+[source]
+----
+case x
+of 5:
+  echo "Five!"
+of 7:
+  echo "Seven!"
+of 10:
+  echo "Ten!"
+else:
+  echo "unknown number"
+----
+
+与 if 语句不同，case 语句必须覆盖所有可能的情况。如果对某些情况不感兴趣，可以使用 `else: discard` .
+
+[source]
+.case.nim
+----
+include::{source-dir}/case.nim[]
+----
+<1> 尽管我们只对 `h` 的三个值感兴趣，但必须包含这一行以涵盖所有其他可能的情况（所有其他字符）。没有它，代码将无法编译。
+
+[source, output]
+----
+You've chosen y
+----
+
+
+
+如果多个值需要执行相同的操作，我们也可以为每个分支使用多个值。
+
+[source]
+.multipleCase.nim
+----
+include::{source-dir}/multipleCase.nim[]
+----
+
+[source, output]
+----
+i is odd
+----

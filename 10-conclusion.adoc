@@ -1,0 +1,32 @@
+= 结语
+
+
+
+是时候结束这篇教程了。希望它对您有所帮助，并让您在编程和/或 Nim 编程语言的学习上迈出了第一步。
+
+这些只是基础知识，我们仅仅触及了皮毛，但应该足以让你编写简单程序并解决一些简单任务或谜题。Nim 还有更多强大功能，希望你能继续探索它的可能性。
+
+
+
+
+
+== 下一步
+
+如果你想继续学习Nim：
+
+* https://nim-lang.org/docs/tut1.html[Official Nim tutorial]
+
+* https://nim-by-example.github.io/[Nim by example]
+
+
+如果你想解决一些编程难题：
+
+* http://adventofcode.com/[Advent of Code]: 每年12月发布的一系列趣味谜题。提供自 2015 年起的往期谜题存档。
+
+* https://projecteuler.net/[Project Euler]: 主要是数学相关的任务。
+
+
+
+{nbsp}
+
+编程愉快！

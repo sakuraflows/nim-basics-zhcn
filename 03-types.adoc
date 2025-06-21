@@ -1,0 +1,364 @@
+= 基本数据类型(Basic data types)
+
+
+
+== 整数 Integers
+
+如前一章所述，整数是没有小数部分且不带小数点的数字。
+
+例如: `32` , `-174` , `0` , `10_000_000` 都是整数。注意，我们可以使用 ` _ ` 作为千位分隔符，使较大的数字更易读（比如写成 `10_000_000` 比 `10000000` 更容易看出我们指的是1000万）。
+
+常见的数学运算符—-—加法（ `+` ）、减法（ `-` ）、乘法（ `*` ）和除法（ `/` ）—-—其行为与预期一致。前三种运算总是产生整数结果，而两个整数相除总会得到一个浮点数（带小数点的数），即使两数能够整除也不例外。
+
+
+整数除法（丢弃小数部分的除法）可以通过 `div` 运算符实现。如果对整数除法的余数（模数）感兴趣，可以使用 `mod` 运算符。
+这两个运算的结果始终是整数。
+
+[source]
+.integers.nim
+----
+include::{source-dir}/integers.nim[]
+----
+<1> `echo` 命令会将紧随其后由逗号分隔的所有内容打印到屏幕上。在本例中，它首先打印字符串 `a + b =` ，然后紧接着在同一行打印表达式 `a + b` 的结果。
+
+我们可以编译并运行上述代码，输出结果应为:
+[source, output]
+----
+a + b = 15
+a - b = 7
+a * b = 44
+a / b = 2.75
+a div b = 2
+a mod b = 3
+----
+
+
+
+
+== 浮点数 Floats
+
+浮点数，简称 floats，是实数的一种 https://en.wikipedia.org/wiki/Floating-point_arithmetic[近似表示] 。
+
+
+例如： `2.73` , `-3.14` , `5.0` , `4e7` 是浮点数。
+
+注意，对于较大的浮点数，我们可以使用科学计数法，其中 e 后面的数字是指数。在这个例子中， `4e7` 是一种表示 `4*10^7` 的记法。
+
+
+我们也可以在两个浮点数之间使用四种基本数学运算。运算符 div 和 mod 未针对浮点数定义。
+
+[source]
+.floats.nim
+----
+include::{source-dir}/floats.nim[]
+----
+
+[source, output]
+----
+c + d = 9.0  <1>
+c - d = 4.5
+c * d = 15.1875
+c / d = 3.0  <1>
+----
+<1> 请注意，在加法和除法的例子中，即使我们得到的数字没有小数部分，结果仍然是浮点类型。
+
+数学运算的优先级符合预期：乘法和除法的优先级高于加法和减法。
+
+[source]
+----
+echo 2 + 3 * 4
+echo 24 - 8 / 4
+----
+
+[source, output]
+----
+14
+22.0
+----
+
+
+
+
+=== 浮点数和整数的转换
+
+
+在Nim中，不同数值类型的变量之间无法进行数学运算，否则会产生错误：
+[source]
+----
+let
+  e = 5
+  f = 23.456
+
+echo e + f   # error
+----
+
+变量的值需要转换为同一类型。
+转换过程很简单：要转换为整数，我们使用 `int` 函数；要转换为浮点数，则使用 `float` 函数。
+[source]
+----
+let
+  e = 5
+  f = 23.987
+
+echo float(e)      <1>
+echo int(f)        <2>
+
+echo float(e) + f  <3>
+echo e + int(f)    <4>
+----
+<1> 打印一个整数的 `float` 形式。（ `e` 仍为整数类型）
+<2> 打印浮点数`f`的 `int` 形式。
+<3> 两个操作数均为浮点数，可以进行加法运算。
+<4> 两个操作数都是整数，可以相加。
+
+
+[source, output]
+----
+5.0
+23
+28.987
+28
+----
+
+NOTE: 使用 `int` 函数将浮点数转换为整数时不会执行四舍五入操作，数字会直接舍弃小数部分。 +
+要进行四舍五入运算，我们必须调用另一个函数，但在此之前需要先了解一些关于如何使用 Nim 的基础知识。
+
+
+
+
+== 字符 Characters
+
+`char` 类型用于表示单个 https://en.wikipedia.org/wiki/ASCII[ASCII] 字符。
+
+
+字符写在两个单引号之间（ `'` ）。
+字符可以是字母、符号或单个数字。
+多个数字或多个字母会导致错误。
+[source]
+----
+let
+  h = 'z'
+  i = '+'
+  j = '2'
+  k = '35' # error
+  l = 'xy' # error
+----
+
+
+
+
+== 字符串 Strings
+
+字符串可以被描述为一系列字符。
+其内容写在两个双引号之间（ `"` ）。
+
+我们可能认为字符串就是单词，但它们可以包含多个单词、一些符号(译者注：可以是utf-8字符)或数字。
+
+[source]
+.strings.nim
+----
+include::{source-dir}/strings.nim[]
+----
+<1> 一个空字符串
+<2> 这不是数字（整数）。它在双引号内，因此是一个字符串。
+<3> 尽管这只是一个字符，但它不是 char 类型，因为它被包含在双引号内。
+
+
+
+
+
+=== 特殊字符 Special characters
+
+如果我们尝试打印以下字符串：
+[source]
+----
+echo "some\nim\tips"
+----
+结果可能会让我们感到惊讶：
+[source, output]
+----
+some
+im	ips
+----
+
+这是因为有几个字符具有特殊含义。
+它们通过在字符前添加转义字符 `\` 来使用。
+
+* `\n` 是换行符
+* `\t` 是一个制表符
+* `\\` 是一个反斜杠（因为一个 `\` 被用作转义字符）
+
+如果我们想按照原样打印上面的示例，那么有两种可能选择：
+
+* 使用 `\\` 而不是 `\` 来打印反斜杠，或者:
+* 使用原始字符串，其语法为 `r"…​"` （在第一个引号前紧接字母 `r` ），其中没有转义字符，也没有特殊含义：所有内容都会原样输出。
+
+[source]
+----
+echo "some\\nim\\tips"
+echo r"some\nim\tips"
+----
+
+[source, output]
+----
+some\nim\tips
+some\nim\tips
+----
+
+除了上面列出的特殊字符外，还有更多特殊字符，它们都可以在 Nim 手册中找到. (https://nim-lang.org/docs/manual.html#lexical-analysis-string-literals[Nim manual])
+
+
+
+
+
+=== 字符串连接 String concatenation
+
+Nim中的字符串是可变的，意味着它们的内容可以改变。
+通过 `add` 函数，我们可以向现有字符串添加（或追加）另一个字符串或字符。如果我们不想改变原始字符串，也可以使用 `&` 运算符来连接（拼接）字符串，这会返回一个新的字符串。
+
+[source]
+.stringConcat.nim
+----
+include::{source-dir}/stringConcat.nim[]
+----
+<1> 如果我们计划修改字符串，它们应该被声明为 `var` 。
+<2> 添加另一个字符串会就地修改现有字符串 `p` ，改变其值。
+<3> 我们也可以向字符串添加一个 `char` 。
+<4> 连接两个字符串会产生一个新的字符串，而不会修改原始字符串。
+
+[source, output]
+----
+p is now: abcdef
+q is now: xyz
+concat: abcdefxyz
+p is still: abcdef
+q is still: xyz
+----
+
+
+
+
+
+
+== 布尔型 Boolean
+
+一个布尔型（Boolean）（或简称 bool ）数据类型只能有两个值： `true` 或 `false` 。布尔值通常用于控制流程（参见<<控制流 Control flow, 下一章>>），并且常常是关系运算符的运算结果。
+
+The usual naming convention for boolean variables is to write them as a simple yes/no (true/false) question, e.g. `isEmpty`, `isFinished`, `isMoving`, etc.
+布尔变量的命名惯例是将其写成简单的 yes/no（真/假）问题形式，例如 `isEmpty` 、 `isFinished` 、 `isMoving` 等。
+
+
+
+=== 关系运算符 Relational operators
+
+关系运算符测试两个实体之间的关系，这两个实体必须是可比较的。
+
+要比较两个值是否相同，使用 `==` （两个等号）。
+不要将其与 `=` 混淆，后者(即“=”)如我们之前所见用于赋值。
+
+以下是针对整数定义的所有关系运算符:
+
+[source]
+.relationalOperators.nim
+----
+include::{source-dir}/relationalOperators.nim[lines=1..11]
+----
+
+[source, output]
+----
+g is greater than h: false
+g is smaller than h: true
+g is equal to h: false
+g is not equal to h: true
+g is greater or equal to h: false
+g is smaller or equal to h: true
+----
+
+
+我们也可以比较字符和字符串：
+
+[source]
+.relationalOperators.nim
+----
+include::{source-dir}/relationalOperators.nim[lines=13..30]
+----
+<1> 所有大写（译者注：应当是ASCII中的英文字符）字母都排在小写字母之前。
+<2> 字符串比较是按字符逐个进行的。前三个字符相同，字符 `b` 小于字符 `z` 。
+<3> 如果字符串的字符不完全相同，比较时长度并不重要。
+<4> 较短的字符串比长的字符串小。
+
+[source, output]
+----
+true
+false
+true
+true
+true
+----
+
+
+
+
+=== 逻辑运算符 Logical operators
+
+Logical operators are used to test the truthiness of an expression consisting of one or more boolean values.
+
+逻辑运算符用于测试由一个或多个布尔值组成的表达式的真值。
+
+* 逻辑 `and` 仅在两个成员都为 `true` 时返回 `true`
+* 逻辑 `or` 在至少有一个成员为 `true` 时返回 `true`
+* 逻辑 `xor` 在一个成员为真而另一个为假时返回 `true`
+* 逻辑运算符 `not` 会反转其操作数的真值：将 `true` 变为 `false`，反之亦然（它是唯一一个只需要一个操作数的逻辑运算符）
+
+[source]
+.logicalOperators.nim
+----
+include::{source-dir}/logicalOperators.nim[]
+----
+
+[source, output]
+----
+T and T: true
+T and F: false
+F and F: false
+---
+T or T: true
+T or F: true
+F or F: false
+---
+T xor T: false
+T xor F: true
+F xor F: false
+---
+not T: false
+not F: true
+----
+
+
+关系运算符和逻辑运算符可以组合在一起形成更复杂的表达式.
+
+例如: `(5 < 7) and (11 + 9 == 32 - 2*6)` 将变为 `true and (20 == 20)` ，接着变为 `true and true` ，最终得到的结果是 `true` 。
+
+
+
+
+== 回顾
+
+这是本教程中最长的一章，我们涵盖了大量内容。请花时间逐一了解每种数据类型，并尝试用它们进行各种操作实验。
+
+这些类型(types)初看可能像是一种限制，但它们能让 Nim 编译器既提升代码运行速度，又确保你不会无意中犯错——这对大型代码库尤为有益。
+
+现在你已经了解了基本数据类型及其相关操作，这些知识足以在Nim中进行一些简单的计算。
+通过完成以下练习来测试你的掌握程度。
+
+
+
+
+== 练习
+
+1. 创建一个不可变变量，包含你的年龄（以年为单位）。打印你的年龄对应的天数。（1 年 = 365 天）
+2. 检查你的年龄是否能被 3 整除。（提示：使用 `mod` ）
+3. 创建一个包含你身高（厘米）的不可变变量，并以英寸为单位打印你的身高。（1 英寸=2.54 厘米）
+4. 一根管子的直径为 3/8 英寸。请用厘米表示该直径。
+5. 创建一个不可变变量存储你的名字，再创建另一个存储你的姓氏。通过拼接前两个变量生成变量 `fullName` ，注意中间要加一个空格。打印你的全名。
+6. 爱丽丝(Alice)每 15 天赚 400 美元。鲍勃每小时赚 3.14 美元，每天工作 8 小时，每周工作 7 天。30 天后，爱丽丝赚的钱比鲍勃多吗？（提示：使用关系运算符）

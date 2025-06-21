@@ -1,0 +1,152 @@
+= 与用户输入交互
+
+
+
+利用目前介绍的内容（基本数据类型和容器、控制流、循环），我们已经能够编写不少简单程序了。
+
+在本章中，我们将学习如何让程序更具交互性。为此，我们需要实现从文件读取数据或向用户请求输入的功能。
+
+
+
+
+== 从文件读取
+
+假设我们有一个名为 `people.txt` 的文本文件，它与 Nim 代码位于同一目录下。该文件内容如下：
+
+[source]
+.people.txt
+----
+include::{source-dir}/people.txt[]
+
+----
+
+我们希望将该文件内容作为名称列表（序列）用于程序中。
+
+[source]
+.readFromFile.nim
+----
+include::{source-dir}/readFromFile.nim[]
+----
+<1> 要读取文件内容，我们使用 `readFile` 过程，并提供一个文件路径以供读取（如果文件与我们的 `Nim` 程序位于同一目录，仅提供文件名即可）。结果将是一个多行字符串。
+<2> 要将多行字符串拆分为字符串序列（每个字符串包含单行的全部内容），我们使用来自 `strutils` 模块的 `splitLines` 。
+
+[source, output]
+----
+Alice A.
+Bob B.
+Carol C.
+            <1>
+@["Alice A.", "Bob B.", "Carol C.", ""] <2>
+----
+<1> 原文件中存在一个最后的空行（末尾空行），此处也保留了该空行。
+<2> 由于末尾的换行符，我们的序列比预期/想要的更长。
+
+为了解决末尾换行符的问题，我们可以在读取文件后使用 strutils 中的 strip 过程。该过程的作用就是移除字符串首尾的所有所谓空白字符。空白字符泛指任何产生间隔的字符，包括换行符、空格、制表符等。
+
+[source]
+.readFromFile2.nim
+----
+include::{source-dir}/readFromFile2.nim[]
+----
+<1> 使用 `strip` 可得到预期结果。
+
+[source, output]
+----
+Alice A.
+Bob B.
+Carol C.
+@["Alice A.", "Bob B.", "Carol C."]
+----
+
+
+
+
+== 读取用户输入
+
+
+若要与用户交互，我们必须能够向其询问输入内容，随后处理并运用这些信息。我们需要通过向 `readLine` 过程传递 `stdin` 参数来从标准输入 https://en.wikipedia.org/wiki/Standard_streams#Standard_input_(stdin)[standard input (stdin)] 读取数据。
+
+[source]
+.interaction1.nim
+----
+include::{source-dir}/interaction1.nim[]
+----
+<1> `name` 的类型被推断为字符串。
+
+
+[source, output]
+----
+Please enter your name:
+        <1>
+----
+<1> 等待用户输入。当我们输入姓名并按下 `Enter` 后，程序将继续执行。
+
+[source, output]
+----
+Please enter your name:
+Alice
+Hello Alice, nice to meet you!
+----
+
+NOTE: 如果您使用的是旧版VS Code，则无法以常规方式运行（使用Ctrl+Alt+N），因为输出窗口不允许用户输入——您需要在终端中运行这些示例。 +
+较新版本的VS Code不存在此类限制。
+
+
+
+
+== 处理数字
+
+从文件或用户输入读取的内容始终以字符串形式返回。若需使用数字，需将字符串转换为数字：我们再次使用 `strutils` 模块，通过 `parseInt` 转换为整数，或使用 `parseFloat` 转换为浮点数。
+
+[source]
+.interaction2.nim
+----
+include::{source-dir}/interaction2.nim[]
+----
+<1> 将字符串转换为整数。这样编写时，我们默认用户会提供有效的整数。如果用户输入 `'79` 或 `ninety-three` 会发生什么？你可以自己试试看。
+
+[source, output]
+----
+Please enter your year of birth:
+1934
+You are 84 years old.
+----
+
+{nbsp}
+
+如果我们有一个文件 `numbers.txt` 与Nim代码位于同一目录下，其内容如下：
+[source]
+.numbers.txt
+----
+include::{source-dir}/numbers.txt[]
+----
+
+我们想要读取该文件并计算所提供数字的总和与平均值，可以这样做：
+
+[source]
+.interaction3.nim
+----
+include::{source-dir}/interaction3.nim[]
+----
+<1> 我们导入多个模块。 `strutils` 提供 `strip` 和 `splitLines` ， `sequtils` 提供 `map` ， `math` 提供 `sum` 。
+<2> 我们移除最后的换行符，并将文本分割成字符串序列。
+<3> `map` 的工作原理是对容器中的每个元素应用一个过程（本例中是 `parseFloat` ）。换句话说，我们将每个字符串转换为浮点数，返回一个新的浮点数序列。
+<4> 使用 `math` 模块中的 `sum` 函数来计算序列中所有元素的总和。
+<5> 我们需要将序列长度转换为浮点数，因为 `sumNums` 是浮点类型。
+
+[source, output]
+----
+226.15
+45.23
+----
+
+
+
+
+== 练习
+
+1. 向用户询问身高和体重，计算其 https://en.wikipedia.org/wiki/Body_mass_index[BMI] 指数。反馈 BMI 数值及对应等级。
+
+2. 重复考拉兹猜想（ <<_练习_2, Collatz conjecture exercise>> ）练习：编写程序让用户输入起始数字，打印生成的数列。
+
+3. 让用户输入需要反转的字符串。创建一个接收字符串并返回反转版本的过程。例如用户输入 `Nim-lang` 时，该过程应返回 `gnal-miN` 。（提示：使用索引和 `countdown` ）

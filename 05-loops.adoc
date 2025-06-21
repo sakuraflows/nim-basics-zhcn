@@ -1,0 +1,236 @@
+= 循环 Loops
+
+
+
+循环是另一种控制流结构，它允许我们多次运行某些代码部分。
+
+在本章中，我们将介绍两种循环类型：
+
+* for循环(for-loop)：运行已知次数
+* while-loop: 只要满足某些条件就会一直运行
+
+
+== for循环(For loop)
+
+for 循环的语法是:
+
+[source]
+----
+for <loopVariable> in <iterable>:
+  <loop body>
+----
+
+传统上， `i` 常被用作 `loopVariable` 名称，但也可以使用其他任何名称。该变量仅在循环内部可用。一旦循环完成，变量的值就会被丢弃。
+
+`iterable` 是我们可以遍历的任何对象。在已经提到的类型中，字符串是可迭代对象。（更多可迭代类型将在下一章介绍。）
+
+循环体(loop body) 中的所有行在每次循环时都会执行，这使我们能够高效地编写重复的代码部分。
+
+{nbsp}
+
+如果要在Nim中遍历一个（整数）数字范围，语法是 `start .. finish` ，其中 `start` 和 `finish` 是数字。
+这将遍历 `start` 和 `finish` 之间的所有数字，包括 `start` 和 `finish` 。对于默认的范围可迭代对象， `start` 需要小于 `finish` 。
+
+如果我们想迭代到一个数字（不包括该数字），可以使用 `..<` :
+
+[source]
+.for1.nim
+----
+include::{source-dir}/for1.nim[]
+----
+<1> 使用 `..` 遍历数字范围——范围的两端都包含在内。
+<2> 使用 `..<` 遍历相同的范围——它会迭代到上限但不包括上限。
+
+[source, output]
+----
+5
+6
+7
+8
+9
+
+5
+6
+7
+8
+----
+
+
+
+如果我们想以不同于1的步长(step size)遍历数字范围，可以使用 `countup` 。通过 `countup` 我们可以定义起始值、终止值（包含在范围内）以及步长。
+
+[source]
+.for2.nim
+----
+include::{source-dir}/for2.nim[lines=1..2]
+----
+<1> 从0开始以步长4向上计数至16（包含16）。
+
+[source, output]
+----
+0
+4
+8
+12
+16
+----
+
+
+要遍历一个范围，其中 `start` 大于 `finish` ，可以使用一个名为 `countdown` 的类似函数。
+即使我们在倒计数，步长也必须是正数。
+
+[source]
+.for2.nim
+----
+include::{source-dir}/for2.nim[lines=5..12]
+----
+<1> To iterate from a higher to a lower number, we must use `countdown` (The `..` operator can only be used when the starting value is smaller than the end value).要从高到低进行迭代，我们必须使用 `countdown` （ `..` 运算符只能在起始值小于结束值时使用）。
+<2> 即使在"倒计时"(counting down)时，步长也必须是一个正数。
+
+[source, output]
+----
+4
+3
+2
+1
+0
+
+-3
+-5
+-7
+-9
+----
+
+
+由于字符串是可迭代的，我们可以使用 `for` 循环来遍历字符串中的每个字符（这种迭代有时称为 `for-each` 循环）。
+
+[source]
+.for3.nim
+----
+include::{source-dir}/for3.nim[lines=1..4]
+----
+
+[source, output]
+----
+a
+l
+p
+h
+a
+b
+e
+t
+----
+
+
+如果还需要一个从零开始的迭代计数器，我们可以使用 `for <counterVariable>, <loopVariable> in <iterator>:` 语法来实现。这在需要遍历一个可迭代对象，同时按相同偏移量访问另一个可迭代对象时非常实用。
+
+[source]
+.for3.nim
+----
+include::{source-dir}/for3.nim[lines=7..9]
+----
+
+[source, output]
+----
+letter 0 is: a
+letter 1 is: l
+letter 2 is: p
+letter 3 is: h
+letter 4 is: a
+letter 5 is: b
+letter 6 is: e
+letter 7 is: t
+----
+
+
+
+
+== while循环 While loop
+
+while循环与if语句类似，但只要条件保持为真，它们就会持续执行其代码块。当我们无法预先知道循环将运行多少次时，就会使用它们。
+
+我们必须确保循环在某个时刻终止，而不会变成无限循环(https://en.wikipedia.org/wiki/Infinite_loop[infinite loop].)
+
+[source]
+.while.nim
+----
+include::{source-dir}/while.nim[]
+----
+<1> 每次进入新循环并执行其中的代码之前，都会检查此条件。
+<2> `inc` 用于将 `a` 加一。这与写成 `a = a + 1` 或 `a += 1` 是相同的。
+
+[source, output]
+----
+a is: 1
+a is: 2
+a is: 3
+final value of a: 4
+----
+
+
+
+
+== 中断（Break）与 继续（continue）
+
+`break` 语句用于提前退出循环，通常在满足某些条件时使用。
+
+在下面的示例中，如果没有包含 `break` 的 `if` 语句，循环将持续运行并打印直到 `i` 达到 `1000` 。而通过 `break` 语句，当 `i` 变为 `3` 时，我们会立即退出循环（此时尚未打印 `i` 的值）。
+
+[source]
+.break.nim
+----
+include::{source-dir}/break.nim[]
+----
+
+[source, output]
+----
+1
+2
+----
+
+{nbsp}
+
+`continue` 语句会立即开始循环的下一次迭代，而不会执行当前迭代的剩余代码。注意以下代码的输出中缺少了 `3` 和 `6` ：
+
+[source]
+.continue.nim
+----
+include::{source-dir}/continue.nim[]
+----
+
+[source, output]
+----
+1
+2
+4
+5
+7
+8
+----
+
+
+
+
+== 练习
+
+1. 科拉兹猜想（ https://en.wikipedia.org/wiki/Collatz_conjecture[Collatz conjecture] ） 是一个规则简单却广受欢迎的数学问题。首先选择一个数字，若为奇数则乘以三加一；若为偶数则除以二。重复此过程直至结果为1。例如：5 → 奇数 → 3*5+1=16 → 偶数 → 16/2=8 → 偶数 → 4 → 2 → 1 → 终止！ +
+选取一个整数（作为可变变量），编写循环打印科拉兹猜想的每一步骤。（提示:使用 `div` 表示除法）
+
+2. 创建一个包含你全名的不可变变量。编写一个 `for` 循环，遍历该字符串并仅打印元音字母（a、e、i、o、u）。（提示：使用 `case` 语句，每个分支包含多个值）
+
+3. https://en.wikipedia.org/wiki/Fizz_buzz[Fizz buzz] 是一种儿童游戏，有时用于测试基础编程能力。我们从1开始向上计数。如果一个数字能被3整除，就用fizz替代；能被5整除则用buzz替代；若同时能被15（即3和5）整除，则替换为 fizzbuzz。前几轮的游戏序列如下:1,2,fizz,4,buzz,fizz, 7,…​ +
+编写一个程序，输出 Fizz buzz 游戏的前 30 轮结果。（提示：注意整除测试的顺序）
+
+4. 在之前的练习中，你已经将英寸转换为厘米，反之亦然。创建一个包含多个值的转换表。例如，表格可能如下所示： +
+----
+in	| cm
+----------------
+1	| 2.54
+4	| 10.16
+7	| 17.78
+10	| 25.4
+13	| 33.02
+16	| 40.64
+19	| 48.26
+----
