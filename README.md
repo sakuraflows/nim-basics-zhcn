@@ -1,5 +1,6 @@
-## forked from narimiran/nim-basics
-## nim-basics-chs
+## Nim Basics | Nim 基础教程中文文档 
+#### 原项目:[nim-basics-chs](https://github.com/sakuraflows/nim-basics-chs)
+
 
 ### 介绍
 自用中文版nim-basics机翻文档。在线预览：[Nim basics 中文文档](https://sakuraflows.github.io/nim-basics-chs/)
@@ -45,7 +46,7 @@ Nim是一门正在快速迭代的新兴程序语言，因此本文档中的内�
 
 <br/>
 
-### 原文档项目地址及网站
+### 原文档项目地址及文档预览网站
 
 [narimiran/nim-basics](https://github.com/narimiran/nim-basics)
 
